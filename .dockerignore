@@ -8,18 +8,23 @@
 .gitignore
 .gitattributes
 
-# IDE & Editor
+# IDE and editors
 .vs/
 .vscode/
 .idea/
 *.user
 *.suo
+*.sln.docstates
 
 # Build outputs
 bin/
 obj/
 out/
 publish/
+
+# NuGet
+*.nupkg
+packages/
 
 # Documentation
 *.md
@@ -29,22 +34,45 @@ publish/
 *.log
 Logs/
 
-# Local settings (secrets)
+# Local settings (IMPORTANT: Never include in Docker image)
 appsettings.Development.json
 appsettings.Local.json
+appsettings.*.local.json
 secrets.json
 
 # Test results
 TestResults/
 coverage/
 
-# Docker
+# Docker files (avoid recursive copy)
 Dockerfile*
 docker-compose*
-.docker/
+.dockerignore
 
-# Misc
+# Render config
+render.yaml
+
+# Temporary files
 *.tmp
 *.temp
 *.bak
+*.swp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# SQL Server files
+*.mdf
+*.ldf
+*.ndf
+
+# Node (if any frontend build)
 node_modules/
+npm-debug.log
+yarn-error.log
+
+# GitHub
+.github/

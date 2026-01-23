@@ -6,9 +6,14 @@ using InkVault.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure port for Render deployment
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://*:{port}");
+
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 // Identity with persistent login support
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -82,7 +87,20 @@ else
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// Only use HTTPS redirection in development
+// Render handles SSL termination at the load balancer level
+if (!app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
+
+// Handle forwarded headers from Render's load balancer
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor 
+                     | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
+});
+
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -91,9 +109,6 @@ app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Health check endpoint for Docker/Render
-app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 app.MapControllerRoute(
 name: "default",

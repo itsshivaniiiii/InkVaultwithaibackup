@@ -1,23 +1,37 @@
 # ===========================================
-# render.yaml - Render Blueprint Configuration
+# Render Blueprint for InkVault
+# https://render.com/docs/blueprint-spec
 # ===========================================
-# This file defines your service configuration for Render
-# Deploy by connecting your GitHub repo to Render
 
 services:
   - type: web
     name: inkvault
     runtime: docker
     dockerfilePath: ./Dockerfile
-    dockerContext: .
-    plan: free  # Change to 'starter' or higher for production
+    region: oregon  # Choose: oregon, ohio, frankfurt, singapore
+    plan: free      # Options: free, starter, standard, pro
+    branch: main
     
-    # Environment variables (set actual values in Render Dashboard)
+    # Health check settings
+    healthCheckPath: /
+    
+    # Auto-deploy on push
+    autoDeploy: true
+    
+    # Environment variables (set these in Render Dashboard)
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: PORT
+        value: 8080
+      
+      # Database connection string (set in Render Dashboard - keep secret)
       - key: ConnectionStrings__DefaultConnection
-        sync: false  # Set in Render Dashboard (sensitive)
+        sync: false  # Must be set manually in dashboard
+      
+      # SMTP Settings (set in Render Dashboard - keep secret)
       - key: SmtpSettings__Server
         sync: false
       - key: SmtpSettings__Port
@@ -26,19 +40,14 @@ services:
         sync: false
       - key: SmtpSettings__SenderPassword
         sync: false
-    
-    # Health check
-    healthCheckPath: /health
-    
-    # Auto-deploy on push
-    autoDeploy: true
-    
-    # Build filter - only rebuild when these paths change
-    buildFilter:
-      paths:
-        - "**/*.cs"
-        - "**/*.cshtml"
-        - "**/*.csproj"
-        - "**/*.json"
-        - "wwwroot/**"
-        - "Dockerfile"
+
+# ===========================================
+# IMPORTANT: After deploying, set these 
+# environment variables in Render Dashboard:
+#
+# ConnectionStrings__DefaultConnection = your-azure-sql-connection-string
+# SmtpSettings__Server = smtp.gmail.com
+# SmtpSettings__Port = 587
+# SmtpSettings__SenderEmail = your-email@gmail.com
+# SmtpSettings__SenderPassword = your-app-password
+# ===========================================
