@@ -160,16 +160,8 @@ namespace InkVault.Controllers
                     user.OTPExpiration = DateTime.UtcNow.AddMinutes(10);
                     await _userManager.UpdateAsync(user);
 
-                    try
-                    {
-                        await _emailService.SendOTPAsync(model.Email, otp);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error sending OTP: {ex}");
-                        ModelState.AddModelError(string.Empty, "Error sending OTP. Please try again.");
-                        return View(model);
-                    }
+                    // Send OTP email asynchronously (non-blocking)
+                    _ = _emailService.SendOTPAsync(model.Email, otp);
 
                     TempData["Email"] = model.Email;
                     return RedirectToAction("VerifyOTP", new { email = model.Email });

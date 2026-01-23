@@ -36,7 +36,14 @@ namespace InkVault.Services
                 </body>
                 </html>";
 
-            await SendEmailAsync(email, subject, body);
+            try
+            {
+                await SendEmailAsync(email, subject, body);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to send OTP email to {Email}. User can still verify via manual entry.", email);
+            }
         }
 
         public async Task SendEmailAsync(string email, string subject, string htmlBody)
