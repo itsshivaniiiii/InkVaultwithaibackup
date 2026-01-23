@@ -157,10 +157,10 @@ web.*.config
 !web.config
 
 # ===========================================
-# Documentation Files (Optional - uncomment to ignore)
+# Documentation Files
 # ===========================================
-# *.md
-# !README.md
+*.md
+!README.md
 
 # ===========================================
 # Temporary & Backup Files
